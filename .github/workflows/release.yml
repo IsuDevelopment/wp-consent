@@ -93,7 +93,7 @@ jobs:
           test -f "$ROOT/vendor/autoload.php"
           test -f "$ROOT/readme.txt"
           test -f "isudev-consent-${VERSION}.zip"
-          if unzip -l "isudev-consent-${VERSION}.zip" | grep -E '(/\.git/|/\.github/|/\.agents/|/AGENTS\.M?D$|/composer\.json$|/package\.json$)' ; then
+          if unzip -l "isudev-consent-${VERSION}.zip" | grep -E '(/\.git/|/\.github/|/\.agents/|/AGENTS\.M?D$|isudev-consent/composer\.json$|isudev-consent/package\.json$)' ; then
             echo 'Development files leaked into the release artifact.'
             exit 1
           fi
