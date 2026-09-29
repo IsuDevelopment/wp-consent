@@ -23,7 +23,7 @@ const CATEGORIES = [ 'preferences', 'analytics', 'marketing' ];
 /**
  * Stored settings merged with defaults.
  *
- * @return array{version: int, days: int, title: string, message: string, categories: array<string, bool>, gravity_datalayer: bool, gf_recaptcha_net: bool}
+ * @return array{version: int, days: int, title: string, message: string, categories: array<string, bool>, gtm_id: string, gravity_datalayer: bool, gf_recaptcha_net: bool}
  */
 function get_config(): array {
 	$saved = (array) \get_option( OPTION, [] );
@@ -34,6 +34,7 @@ function get_config(): array {
 		'title'             => (string) ( $saved['title'] ?? '' ),
 		'message'           => (string) ( $saved['message'] ?? '' ),
 		'categories'        => \array_combine( CATEGORIES, \array_map( fn( $c ) => (bool) ( $saved['categories'][ $c ] ?? true ), CATEGORIES ) ),
+		'gtm_id'            => sanitize_gtm_id( $saved['gtm_id'] ?? '' ),
 		'gravity_datalayer' => ! empty( $saved['gravity_datalayer'] ),
 		'gf_recaptcha_net'  => ! empty( $saved['gf_recaptcha_net'] ),
 	];
@@ -101,6 +102,7 @@ function sanitize( $value ): array {
 		'title'             => \sanitize_text_field( (string) ( $value['title'] ?? '' ) ),
 		'message'           => \sanitize_textarea_field( (string) ( $value['message'] ?? '' ) ),
 		'categories'        => \array_combine( CATEGORIES, \array_map( fn( $c ) => ! empty( $value['categories'][ $c ] ), CATEGORIES ) ),
+		'gtm_id'            => sanitize_gtm_id( $value['gtm_id'] ?? '' ),
 		'gravity_datalayer' => ! empty( $value['gravity_datalayer'] ),
 		'gf_recaptcha_net'  => ! empty( $value['gf_recaptcha_net'] ),
 	];
@@ -146,6 +148,13 @@ function render_page(): void {
 		<form method="post" action="options.php">
 			<?php \settings_fields( 'isudev_consent' ); ?>
 			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="ic-gtm-id"><?php \esc_html_e( 'Google Tag Manager', 'isudev-consent' ); ?></label></th>
+					<td>
+						<input type="text" id="ic-gtm-id" class="regular-text code" name="<?php echo $name( 'gtm_id' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $name. ?>" value="<?php echo \esc_attr( $settings['gtm_id'] ); ?>" placeholder="GTM-XXXXXXX" pattern="GTM-[A-Za-z0-9]{4,12}" autocomplete="off">
+						<p class="description"><?php \esc_html_e( 'Container ID, e.g. GTM-ABC1234. Leave empty to load no tag. Consent Mode v2 is set before GTM.', 'isudev-consent' ); ?></p>
+					</td>
+				</tr>
 				<tr>
 					<th scope="row"><label for="ic-title"><?php \esc_html_e( 'Title', 'isudev-consent' ); ?></label></th>
 					<td><input type="text" id="ic-title" class="regular-text" name="<?php echo $name( 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $name. ?>" value="<?php echo \esc_attr( $settings['title'] ); ?>" placeholder="<?php echo \esc_attr( $texts['title'] ); ?>"></td>

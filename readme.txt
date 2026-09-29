@@ -4,7 +4,7 @@ Tags: cookies, consent, privacy, google consent mode, gdpr
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -14,7 +14,7 @@ Lightweight cookie consent banner for WordPress with Google Consent Mode v2, equ
 
 IsuDev Consent has no external scripts and is designed to remain compatible with full-page caching. It prints Consent Mode defaults before later tag loaders, updates the state from the first-party consent cookie, and only loads the banner CSS when the visitor needs to make a choice.
 
-Settings are available under **Settings → Cookies**. The banner supports preferences, analytics and marketing categories, a configurable policy version, consent lifetime and a privacy-policy link.
+Settings are available under **Settings → Cookies**. The banner supports preferences, analytics and marketing categories, a configurable policy version, consent lifetime, a privacy-policy link and an optional validated Google Tag Manager container ID. GTM loads after the Consent Mode defaults; its no-JavaScript iframe is intentionally omitted because it cannot receive those defaults.
 
 Third-party snippets can be delayed with `script type="text/plain"` and `data-consent="analytics"`, `marketing` or `preferences`. The plugin emits `consent_update` and `consent_ready` data layer events for GTM integrations.
 
@@ -29,6 +29,11 @@ Download `isudev-consent.zip` from the GitHub releases page and install it as a 
 `composer require isudev/consent`
 
 == Changelog ==
+
+= 1.3.0 =
+* Added an optional, validated Google Tag Manager container loader that runs after Consent Mode defaults.
+* Added bundled Polish, German, Norwegian Bokmål, Swedish, Portuguese, French, Spanish, Ukrainian and Italian translations.
+* Fixed packaged translation loading.
 
 = 1.2.1 =
 * Lowered banner selector specificity to zero for theme overrides.

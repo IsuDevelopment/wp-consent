@@ -3,7 +3,7 @@
  * Plugin Name:       IsuDev Consent
  * Plugin URI:        https://github.com/IsuDevelopment/wp-consent
  * Description:       Lightweight cookie consent banner: Google Consent Mode v2, equal Accept/Reject, categories, consent log. No external scripts; CSS loads only when the banner shows.
- * Version:           1.2.1
+ * Version:           1.3.0
  * Requires at least: 6.5
  * Requires PHP:      8.2
  * Author:            IsuDev
@@ -22,9 +22,17 @@ namespace IsuDev\Consent;
 
 defined( 'ABSPATH' ) || exit;
 
-const VERSION     = '1.2.1';
+const VERSION     = '1.3.0';
 const FILE        = __FILE__;
 const PLUGIN_FILE = __FILE__;
+
+// Register the bundled language directory on init, before any settings or front-end copy is requested.
+\add_action(
+	'init',
+	static function (): void {
+		\load_plugin_textdomain( 'isudev-consent', false, \dirname( \plugin_basename( FILE ) ) . '/languages' );
+	}
+);
 
 // Flat glob, alphabetical: settings.php (options, defaults) is used by the others only at run time.
 \array_map( fn( $file ) => require_once $file, (array) \glob( __DIR__ . '/includes/*.php' ) );

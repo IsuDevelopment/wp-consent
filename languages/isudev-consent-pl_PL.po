@@ -1,0 +1,153 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: IsuDev Consent 1.2.1\n"
+"PO-Revision-Date: 2026-09-29 22:00+0200\n"
+"Last-Translator: IsuDev <hello@isudev.pl>\n"
+"Language-Team: Polish <pl@li.org>\n"
+"Language: pl_PL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Domain: isudev-consent\n"
+
+msgid "IsuDev Consent"
+msgstr "IsuDev Consent"
+
+msgid "https://github.com/IsuDevelopment/wp-consent"
+msgstr "https://github.com/IsuDevelopment/wp-consent"
+
+msgid "Lightweight cookie consent banner: Google Consent Mode v2, equal Accept/Reject, categories, consent log. No external scripts; CSS loads only when the banner shows."
+msgstr "Lekki baner zgód na cookies: Google Consent Mode v2, równorzędne Akceptuj/Odrzuć, kategorie i dziennik zgód. Bez zewnętrznych skryptów; CSS ładuje się tylko, gdy baner jest widoczny."
+
+msgid "IsuDev"
+msgstr "IsuDev"
+
+msgid "https://isudev.pl"
+msgstr "https://isudev.pl"
+
+msgid "No choices recorded in the last 30 days."
+msgstr "Brak zapisanych wyborów w ostatnich 30 dniach."
+
+msgid "Accepted all"
+msgstr "Akceptacja wszystkich"
+
+msgid "Rejected all"
+msgstr "Odrzucenie wszystkich"
+
+msgid "Custom choice"
+msgstr "Wybór własny"
+
+msgid "Last 30 days"
+msgstr "Ostatnie 30 dni"
+
+msgid "We use cookies"
+msgstr "Używamy plików cookies"
+
+msgid "We use necessary cookies to run the site. With your consent we also use analytics and marketing cookies to see how the site is used and to show relevant ads. You can change your choice at any time in cookie settings."
+msgstr "Używamy niezbędnych plików cookies, aby strona działała. Za Twoją zgodą korzystamy też z cookies analitycznych i marketingowych, żeby wiedzieć, jak korzystasz ze strony, i pokazywać dopasowane reklamy. Swój wybór możesz w każdej chwili zmienić w ustawieniach cookies."
+
+msgid "Accept all"
+msgstr "Akceptuję wszystkie"
+
+msgid "Reject all"
+msgstr "Odrzucam wszystkie"
+
+msgid "Settings"
+msgstr "Ustawienia"
+
+msgid "Save choices"
+msgstr "Zapisz wybrane"
+
+msgid "Allow all"
+msgstr "Zezwól na wszystkie"
+
+msgid "We respect your privacy. Choose which cookies we may use; you can change it at any time."
+msgstr "Szanujemy Twoją prywatność. Wybierz, na które pliki cookies się zgadzasz – w każdej chwili możesz to zmienić."
+
+msgid "Privacy policy"
+msgstr "Polityka prywatności"
+
+msgid "Necessary"
+msgstr "Niezbędne"
+
+msgid "Required for the site to work: cart, login, security, this choice. Always on."
+msgstr "Potrzebne do działania strony: koszyk, logowanie, bezpieczeństwo i zapamiętanie tego wyboru. Zawsze włączone."
+
+msgid "Preferences"
+msgstr "Preferencje"
+
+msgid "Remember your settings, e.g. recently viewed items."
+msgstr "Zapamiętują Twoje ustawienia, np. ostatnio oglądane produkty."
+
+msgid "Analytics"
+msgstr "Analityczne"
+
+msgid "Statistics that help us improve the site, e.g. Google Analytics."
+msgstr "Statystyki, które pomagają nam ulepszać stronę, np. Google Analytics."
+
+msgid "Marketing"
+msgstr "Marketingowe"
+
+msgid "Ads and remarketing, e.g. Google Ads or Meta."
+msgstr "Reklamy i remarketing, np. Google Ads lub Meta."
+
+msgid "Always on"
+msgstr "Zawsze włączone"
+
+msgid "Cookie consent"
+msgstr "Zgody na cookies"
+
+msgid "Cookies"
+msgstr "Cookies"
+
+msgid "Google Tag Manager"
+msgstr "Google Tag Manager"
+
+msgid "Container ID, e.g. GTM-ABC1234. Leave empty to load no tag. Consent Mode v2 is set before GTM."
+msgstr "Identyfikator kontenera, np. GTM-ABC1234. Pozostaw puste pole, aby nie ładować tagu. Consent Mode v2 jest ustawiany przed GTM."
+
+msgid "Title"
+msgstr "Tytuł"
+
+msgid "Message"
+msgstr "Treść"
+
+msgid "Empty = the default text. The privacy policy link comes from Settings → Privacy."
+msgstr "Puste pole = tekst domyślny. Link do polityki prywatności pochodzi z Ustawienia → Prywatność."
+
+msgid "Categories"
+msgstr "Kategorie"
+
+msgid "Show only the categories the site really uses. Consent Mode: preferences = functionality/personalization storage, analytics = analytics_storage, marketing = ad_storage, ad_user_data, ad_personalization."
+msgstr "Pokazuj tylko kategorie, których strona faktycznie używa. Consent Mode: preferencje = functionality/personalization storage, analityczne = analytics_storage, marketingowe = ad_storage, ad_user_data, ad_personalization."
+
+msgid "Policy version"
+msgstr "Wersja zasad"
+
+msgid "Raise it after adding a new tool or purpose: every visitor is asked again."
+msgstr "Podnieś po dodaniu nowego narzędzia lub celu – każdy odwiedzający zostanie zapytany ponownie."
+
+msgid "Remember the choice for (days)"
+msgstr "Pamiętaj wybór przez (dni)"
+
+msgid "Gravity Forms reCAPTCHA"
+msgstr "Gravity Forms reCAPTCHA"
+
+msgid "Load GF CAPTCHA from recaptcha.net"
+msgstr "Ładuj CAPTCHA Gravity Forms z recaptcha.net"
+
+msgid "Replaces the Gravity Forms reCAPTCHA script host to avoid unnecessary google.com cookies."
+msgstr "Zastępuje host skryptu reCAPTCHA Gravity Forms, aby uniknąć niepotrzebnych plików cookies google.com."
+
+msgid "Add Gravity Forms DataLayer events"
+msgstr "Dodaj zdarzenia DataLayer z Gravity Forms"
+
+msgid "Pushes gform_submit after a successful Gravity Forms submission. Events are sent only after analytics or marketing consent."
+msgstr "Wysyła gform_submit po pomyślnym wysłaniu formularza Gravity Forms. Zdarzenia są wysyłane tylko po zgodzie analitycznej lub marketingowej."
+
+msgid "Consent log"
+msgstr "Dziennik zgód"
+
+msgid "Pseudonymous record of choices (random ID, choices, policy version, time, hashed network address), kept for 2 years, to demonstrate consent. Re-open the banner with any link to #cookie-settings or an element with data-consent-open."
+msgstr "Pseudonimowy zapis wyborów (losowy identyfikator, wybory, wersja zasad, czas, zahashowany adres sieci) przechowywany przez 2 lata, aby móc wykazać zgodę. Baner otworzysz ponownie linkiem do #cookie-settings lub elementem z atrybutem data-consent-open."
