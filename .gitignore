@@ -1,0 +1,7 @@
+/vendor/
+/dist/
+/*.zip
+/.phpcs.cache
+/.DS_Store
+/.idea/
+/.vscode/

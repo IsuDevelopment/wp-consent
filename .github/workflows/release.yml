@@ -1,12 +1,5 @@
 name: Build & Release
 
-# Cutting a release is a deliberate act: push a tag, or dispatch manually.
-#
-# This previously fired on any push to main that touched isudev-library.php,
-# deriving the tag from the version header. The sibling wp-content-bridge project
-# ran that trigger and, on 2026-08-07, published a release built from a rename
-# commit alone — the feature work landed in a follow-up commit that did not touch
-# the version line, so it shipped a version that did not contain its own release.
 on:
   workflow_dispatch:
   push:
@@ -26,176 +19,105 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Read version from plugin header
+      - name: Read and validate version
         id: version
         run: |
-          VERSION=$(grep -m1 'Version:' isudev-library.php | awk '{print $NF}' | tr -d '[:space:]')
+          VERSION=$(grep -m1 'Version:' isudev-consent.php | awk '{print $NF}' | tr -d '[:space:]')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          grep -Eq "const VERSION[[:space:]]*=[[:space:]]*'$VERSION';" isudev-consent.php
+          grep -q "^Stable tag: $VERSION$" readme.txt
+          grep -q '"version": "'$VERSION'"' composer.json
 
-      # A tag disagreeing with the plugin header would publish the artifact under
-      # a version it does not contain.
-      - name: Assert the pushed tag matches the plugin header
+      - name: Assert pushed tag matches version
         if: github.ref_type == 'tag'
-        run: |
-          if [ "${{ github.ref_name }}" != "${{ steps.version.outputs.tag }}" ]; then
-            echo "Tag ${{ github.ref_name }} does not match plugin header version ${{ steps.version.outputs.version }}."
-            exit 1
-          fi
+        run: test "${{ github.ref_name }}" = "${{ steps.version.outputs.tag }}"
 
-      - name: Check if tag already exists
-        id: tag_check
+      - name: Create release tag for manual run
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
         run: |
-          if git rev-parse "refs/tags/v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
+          git fetch --tags --force
+          if git show-ref --tags --verify --quiet "refs/tags/${RELEASE_TAG}"; then
+            test "$(git rev-list -n1 "${RELEASE_TAG}")" = "${GITHUB_SHA}"
           else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag "${RELEASE_TAG}" "${GITHUB_SHA}"
+            git push origin "${RELEASE_TAG}"
           fi
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.2'
           tools: composer:v2
 
-      - name: Install Composer dependencies
-        run: composer install --no-dev --optimize-autoloader
+      - name: Install production dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-
-      - name: Build editor assets
-        run: |
-          npm ci
-          npm run build
-
-      # Only when dispatched from a branch; a tag push already has its tag.
-      #
-      # The tag must carry build/, so Composer installs from this repository get a
-      # runnable plugin without a build step. build/ is committed on main (see
-      # AGENTS.md), so the rebuild above usually reproduces it byte for byte and
-      # there is nothing to commit. An unconditional `git commit` therefore exits 1
-      # and, under `bash -e`, failed the whole release — it did exactly that on the
-      # first attempt at v1.11.0. Commit only when the rebuild actually differs,
-      # which is what a version bump pushed without a fresh build produces.
-      - name: Create and push the tag
-        if: steps.tag_check.outputs.exists == 'false' && github.ref_type == 'branch'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f build
-          if git diff --cached --quiet; then
-            echo "build/ on main already matches a fresh build; tagging as is."
-          else
-            echo "Rebuild differs from the committed build/; committing it onto the tag."
-            git commit -m "Build v${{ steps.version.outputs.version }}"
-          fi
-          git tag "v${{ steps.version.outputs.version }}"
-          git push origin "v${{ steps.version.outputs.version }}"
-
-      - name: Build plugin zip
+      - name: Build plugin ZIP
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          mkdir -p dist/isudev-library
-          # One exclude list, .distignore, shared with `wp dist-archive` — a second
-          # hand-maintained list is what put src/ (runtime code) out of the zip.
-          #
-          # The single exception: vendor/. .distignore drops it, the zip needs it,
-          # because is_readable( vendor/autoload.php ) is how the plugin tells a
-          # release-zip install from a Composer-managed one and only the former
-          # enables self-updates. The --include comes first on purpose: rsync takes
-          # the first matching rule, so this also shields every file inside vendor/
-          # from .distignore's unanchored root-file patterns.
-          rsync -a --include='/vendor/***' --exclude-from=.distignore ./ dist/isudev-library/
-          cd dist && zip -rq "../isudev-library-${VERSION}.zip" isudev-library
+          mkdir -p dist/isudev-consent
+          rsync -a --exclude-from=- ./ dist/isudev-consent/ <<'EOF'
+          /.git/
+          /.github/
+          /.agents/
+          /.claude/
+          /.superpowers/
+          /dist/
+          /tests/
+          /tools/
+          /AGENTS.MD
+          /CLAUDE.MD
+          /CODEX.md
+          /GEMINI.md
+          /.DS_Store
+          /composer.json
+          /composer.lock
+          /package.json
+          /node_modules/
+          EOF
+          cd dist && zip -rq "../isudev-consent-${VERSION}.zip" isudev-consent
 
-      # Fail the release rather than publish a broken or leaking artifact.
-      - name: Assert the artifact is complete and clean
+      - name: Assert artifact contents
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          ROOT="dist/isudev-library"
-
-          # Runtime code. src/ and extensions/ are discovered from disk at runtime,
-          # so they are not build input and must be present.
-          for required in \
-            "$ROOT/isudev-library.php" \
-            "$ROOT/uninstall.php" \
-            "$ROOT/vendor/autoload.php" \
-            "$ROOT/build/blocks-manifest.php" \
-            "$ROOT/includes/class-registry.php" \
-            "$ROOT/includes/class-extensions.php" \
-            "$ROOT/assets" \
-            "$ROOT/languages"; do
-            if [ ! -e "$required" ]; then
-              echo "Artifact is missing $required"
-              exit 1
-            fi
-          done
-
-          BLOCKS=$(find "$ROOT/src/blocks" -mindepth 2 -maxdepth 2 -name block.php | wc -l | tr -d ' ')
-          EXTENSIONS=$(find "$ROOT/extensions" -mindepth 2 -maxdepth 2 -name extension.php | wc -l | tr -d ' ')
-          echo "Artifact carries $BLOCKS block descriptors and $EXTENSIONS extension descriptors."
-          if [ "$BLOCKS" -lt 1 ] || [ "$EXTENSIONS" -lt 1 ]; then
-            echo "Artifact would register nothing."
+          ROOT=dist/isudev-consent
+          test -f "$ROOT/isudev-consent.php"
+          test -f "$ROOT/includes/update-checker.php"
+          test -f "$ROOT/vendor/autoload.php"
+          test -f "$ROOT/readme.txt"
+          test -f "isudev-consent-${VERSION}.zip"
+          if unzip -l "isudev-consent-${VERSION}.zip" | grep -E '(/\.git/|/\.github/|/\.agents/|/AGENTS\.M?D$|/composer\.json$|/package\.json$)' ; then
+            echo 'Development files leaked into the release artifact.'
             exit 1
           fi
 
-          # Development files that must never reach an install.
-          LEAKED=$(find "$ROOT" \( \
-              -name node_modules -o -name .git -o -name .github -o -name .agents \
-              -o -name .claude -o -name .superpowers -o -name docs -o -name guides \
-              -o -name e2e -o -name tools -o -name AGENTS.md -o -name CLAUDE.md \
-              -o -name composer.json -o -name package.json -o -name phpcs.xml.dist \
-              -o -name webpack.config.js -o -name playwright.config.js \
-            \) -not -path "$ROOT/vendor/*" || true)
-          if [ -n "$LEAKED" ]; then
-            echo "Development files leaked into the artifact:"
-            echo "$LEAKED"
-            exit 1
-          fi
-
-          echo "Artifact contents OK"
-
-      # generate_release_notes alone produces a commit list and no notes. The
-      # changelog a human wrote already exists in CHANGELOG.md; lift that section
-      # into the release body so the two cannot drift, and fail when it is missing
-      # — a release with no changelog entry is a defect, not something to publish
-      # quietly.
-      - name: Extract this version's changelog
+      - name: Extract changelog
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          awk -v v="$VERSION" '
-            $0 ~ "^## " v " " { found = 1; next }
-            found && /^## / { exit }
-            found { print }
-          ' CHANGELOG.md > changelog-section.md
-
-          if [ ! -s changelog-section.md ]; then
-            echo "CHANGELOG.md has no section for $VERSION."
-            exit 1
-          fi
-
+          awk -v v="= $VERSION =" '$0 == v { found=1; next } found && /^= [0-9]+\.[0-9]+/ { exit } found { print }' readme.txt > changelog-section.md
+          test -s changelog-section.md
           {
-            cat changelog-section.md
+            echo '## Changelog'
             echo
-            echo "---"
+            sed 's/^\* /- /' changelog-section.md
             echo
-            echo "**Install:** download \`isudev-library-${VERSION}.zip\` below and install it as a plugin, or let the built-in updater offer it."
+            echo '---'
+            echo
+            echo "**Install:** download \`isudev-consent-${VERSION}.zip\` below and install it as a plugin, or let the built-in updater offer it."
           } > release-body.md
-
-          echo "Release body:"
-          cat release-body.md
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version }}
           name: v${{ steps.version.outputs.version }}
-          files: isudev-library-${{ steps.version.outputs.version }}.zip
+          files: isudev-consent-${{ steps.version.outputs.version }}.zip
           body_path: release-body.md

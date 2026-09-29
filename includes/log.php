@@ -53,7 +53,8 @@ function install_log_table(): void {
 
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-	\dbDelta( 'CREATE TABLE ' . log_table() . " (
+	\dbDelta(
+		'CREATE TABLE ' . log_table() . " (
 		id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 		consent_id char(36) NOT NULL,
 		choices varchar(64) NOT NULL,
@@ -64,7 +65,8 @@ function install_log_table(): void {
 		PRIMARY KEY  (id),
 		KEY consent_id (consent_id),
 		KEY created_at (created_at)
-	) {$wpdb->get_charset_collate()};" );
+	) {$wpdb->get_charset_collate()};"
+	);
 
 	\update_option( DB_VERSION_OPTION, DB_VERSION, false );
 }
@@ -75,27 +77,31 @@ function install_log_table(): void {
  * @return void
  */
 function register_route(): void {
-	\register_rest_route( 'isudev-consent/v1', '/log', [
-		'methods'             => 'POST',
-		'callback'            => __NAMESPACE__ . '\\store',
-		'permission_callback' => '__return_true',
-		'args'                => [
-			'id'     => [
-				'type'     => 'string',
-				'required' => true,
-				'pattern'  => '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+	\register_rest_route(
+		'isudev-consent/v1',
+		'/log',
+		[
+			'methods'             => 'POST',
+			'callback'            => __NAMESPACE__ . '\\store',
+			'permission_callback' => '__return_true',
+			'args'                => [
+				'id'     => [
+					'type'     => 'string',
+					'required' => true,
+					'pattern'  => '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+				],
+				'v'      => [
+					'type'    => 'integer',
+					'minimum' => 1,
+				],
+				'c'      => [ 'type' => 'object' ],
+				'action' => [
+					'type' => 'string',
+					'enum' => [ 'accept_all', 'reject_all', 'custom' ],
+				],
 			],
-			'v'      => [
-				'type'    => 'integer',
-				'minimum' => 1,
-			],
-			'c'      => [ 'type' => 'object' ],
-			'action' => [
-				'type' => 'string',
-				'enum' => [ 'accept_all', 'reject_all', 'custom' ],
-			],
-		],
-	] );
+		]
+	);
 }
 
 /**
@@ -137,14 +143,17 @@ function store( \WP_REST_Request $request ) {
 	$choices = (array) $request->get_param( 'c' );
 	$flags   = \implode( ',', \array_map( fn( $c ) => $c . '=' . ( empty( $choices[ \substr( $c, 0, 1 ) ] ) ? 0 : 1 ), CATEGORIES ) );
 
-	$wpdb->insert( log_table(), [ // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
-		'consent_id' => (string) $request->get_param( 'id' ),
-		'choices'    => $flags,
-		'action'     => (string) ( $request->get_param( 'action' ) ?? 'custom' ),
-		'version'    => (int) ( $request->get_param( 'v' ) ?? 1 ),
-		'ip_hash'    => $hash,
-		'created_at' => \current_time( 'mysql', true ),
-	] );
+	$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
+		log_table(),
+		[
+			'consent_id' => (string) $request->get_param( 'id' ),
+			'choices'    => $flags,
+			'action'     => (string) ( $request->get_param( 'action' ) ?? 'custom' ),
+			'version'    => (int) ( $request->get_param( 'v' ) ?? 1 ),
+			'ip_hash'    => $hash,
+			'created_at' => \current_time( 'mysql', true ),
+		]
+	);
 
 	// Occasional retention cleanup (2 years).
 	if ( 1 === \wp_rand( 1, 200 ) ) {

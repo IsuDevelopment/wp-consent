@@ -23,17 +23,19 @@ const CATEGORIES = [ 'preferences', 'analytics', 'marketing' ];
 /**
  * Stored settings merged with defaults.
  *
- * @return array{version: int, days: int, title: string, message: string, categories: array<string, bool>}
+ * @return array{version: int, days: int, title: string, message: string, categories: array<string, bool>, gravity_datalayer: bool, gf_recaptcha_net: bool}
  */
 function get_config(): array {
 	$saved = (array) \get_option( OPTION, [] );
 
 	return [
-		'version'    => \max( 1, (int) ( $saved['version'] ?? 1 ) ),
-		'days'       => \min( 395, \max( 30, (int) ( $saved['days'] ?? 180 ) ) ),
-		'title'      => (string) ( $saved['title'] ?? '' ),
-		'message'    => (string) ( $saved['message'] ?? '' ),
-		'categories' => \array_combine( CATEGORIES, \array_map( fn( $c ) => (bool) ( $saved['categories'][ $c ] ?? true ), CATEGORIES ) ),
+		'version'           => \max( 1, (int) ( $saved['version'] ?? 1 ) ),
+		'days'              => \min( 395, \max( 30, (int) ( $saved['days'] ?? 180 ) ) ),
+		'title'             => (string) ( $saved['title'] ?? '' ),
+		'message'           => (string) ( $saved['message'] ?? '' ),
+		'categories'        => \array_combine( CATEGORIES, \array_map( fn( $c ) => (bool) ( $saved['categories'][ $c ] ?? true ), CATEGORIES ) ),
+		'gravity_datalayer' => ! empty( $saved['gravity_datalayer'] ),
+		'gf_recaptcha_net'  => ! empty( $saved['gf_recaptcha_net'] ),
 	];
 }
 
@@ -73,28 +75,34 @@ function get_texts(): array {
  * @return void
  */
 function register_settings(): void {
-	\register_setting( 'isudev_consent', OPTION, [
-		'type'              => 'array',
-		'sanitize_callback' => __NAMESPACE__ . '\\sanitize',
-		'default'           => [],
-	] );
+	\register_setting(
+		'isudev_consent',
+		OPTION,
+		[
+			'type'              => 'array',
+			'sanitize_callback' => __NAMESPACE__ . '\\sanitize',
+			'default'           => [],
+		]
+	);
 }
 
 /**
  * Sanitize the option.
  *
  * @param mixed $value Raw value.
- * @return array
+ * @return array<string, mixed>
  */
 function sanitize( $value ): array {
 	$value = (array) $value;
 
 	return [
-		'version'    => \max( 1, (int) ( $value['version'] ?? 1 ) ),
-		'days'       => \min( 395, \max( 30, (int) ( $value['days'] ?? 180 ) ) ),
-		'title'      => \sanitize_text_field( (string) ( $value['title'] ?? '' ) ),
-		'message'    => \sanitize_textarea_field( (string) ( $value['message'] ?? '' ) ),
-		'categories' => \array_combine( CATEGORIES, \array_map( fn( $c ) => ! empty( $value['categories'][ $c ] ), CATEGORIES ) ),
+		'version'           => \max( 1, (int) ( $value['version'] ?? 1 ) ),
+		'days'              => \min( 395, \max( 30, (int) ( $value['days'] ?? 180 ) ) ),
+		'title'             => \sanitize_text_field( (string) ( $value['title'] ?? '' ) ),
+		'message'           => \sanitize_textarea_field( (string) ( $value['message'] ?? '' ) ),
+		'categories'        => \array_combine( CATEGORIES, \array_map( fn( $c ) => ! empty( $value['categories'][ $c ] ), CATEGORIES ) ),
+		'gravity_datalayer' => ! empty( $value['gravity_datalayer'] ),
+		'gf_recaptcha_net'  => ! empty( $value['gf_recaptcha_net'] ),
 	];
 }
 
@@ -110,8 +118,8 @@ function add_page(): void {
 /**
  * Plugins screen shortcut.
  *
- * @param array $links Action links.
- * @return array
+ * @param array<int, string> $links Action links.
+ * @return array<int, string>
  */
 function add_settings_link( array $links ): array {
 	\array_unshift( $links, \sprintf( '<a href="%s">%s</a>', \esc_url( \admin_url( 'options-general.php?page=isudev-consent' ) ), \esc_html__( 'Settings', 'isudev-consent' ) ) );
@@ -143,6 +151,13 @@ function render_page(): void {
 					<td><input type="text" id="ic-title" class="regular-text" name="<?php echo $name( 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $name. ?>" value="<?php echo \esc_attr( $settings['title'] ); ?>" placeholder="<?php echo \esc_attr( $texts['title'] ); ?>"></td>
 				</tr>
 				<tr>
+					<th scope="row"><?php \esc_html_e( 'Gravity Forms reCAPTCHA', 'isudev-consent' ); ?></th>
+					<td>
+						<label><input type="checkbox" name="<?php echo $name( 'gf_recaptcha_net' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $name. ?>" value="1"<?php \checked( $settings['gf_recaptcha_net'] ); ?>> <?php \esc_html_e( 'Load GF CAPTCHA from recaptcha.net', 'isudev-consent' ); ?></label>
+						<p class="description"><?php \esc_html_e( 'Replaces the Gravity Forms reCAPTCHA script host to avoid unnecessary google.com cookies.', 'isudev-consent' ); ?></p>
+					</td>
+				</tr>
+				<tr>
 					<th scope="row"><label for="ic-message"><?php \esc_html_e( 'Message', 'isudev-consent' ); ?></label></th>
 					<td><textarea id="ic-message" class="large-text" rows="4" name="<?php echo $name( 'message' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $name. ?>" placeholder="<?php echo \esc_attr( $texts['message'] ); ?>"><?php echo \esc_textarea( $settings['message'] ); ?></textarea>
 					<p class="description"><?php \esc_html_e( 'Empty = the default text. The privacy policy link comes from Settings → Privacy.', 'isudev-consent' ); ?></p></td>
@@ -164,6 +179,13 @@ function render_page(): void {
 				<tr>
 					<th scope="row"><label for="ic-days"><?php \esc_html_e( 'Remember the choice for (days)', 'isudev-consent' ); ?></label></th>
 					<td><input type="number" min="30" max="395" id="ic-days" class="small-text" name="<?php echo $name( 'days' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $name. ?>" value="<?php echo \esc_attr( (string) $settings['days'] ); ?>"></td>
+				</tr>
+				<tr>
+					<th scope="row"><?php \esc_html_e( 'Google Tag Manager', 'isudev-consent' ); ?></th>
+					<td>
+						<label><input type="checkbox" name="<?php echo $name( 'gravity_datalayer' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $name. ?>" value="1"<?php \checked( $settings['gravity_datalayer'] ); ?>> <?php \esc_html_e( 'Add Gravity Forms DataLayer events', 'isudev-consent' ); ?></label>
+						<p class="description"><?php \esc_html_e( 'Pushes gform_submit after a successful Gravity Forms submission. Events are sent only after analytics or marketing consent.', 'isudev-consent' ); ?></p>
+					</td>
 				</tr>
 			</table>
 			<?php \submit_button(); ?>
