@@ -9,7 +9,9 @@ analytics, marketing), a pseudonymous consent log, no external scripts. Returnin
 - Load a third-party snippet only after consent: `<script type="text/plain" data-consent="analytics">…</script>`.
 - GTM: load it after this plugin's head snippet (priority > 0); use `consent_update` / `consent_ready` dataLayer
   events or the built-in consent checks in tags.
-- Styling: override `--ic-bg`, `--ic-text`, `--ic-muted`, `--ic-border`, `--ic-accent`, `--ic-accent-hover`,
-  `--ic-on-accent`, `--ic-radius`, `--ic-font` on `.ic-banner`.
+- Styling: the plugin selectors have zero specificity. Override tokens with a selector such as
+  `:root :where(.ic-banner)`. Secondary buttons use `--ic-btn-secondary-bg`, `--ic-btn-secondary-color`,
+  `--ic-btn-secondary-border` and matching `--ic-btn-secondary-hover-*` tokens. Primary buttons use the matching
+  `--ic-btn-primary-*` tokens.
 
 Details and the rationale: `.agents/code-map/isudev-consent.md` in the repository.

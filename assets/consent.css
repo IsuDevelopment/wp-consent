@@ -1,14 +1,26 @@
 /* IsuDev Consent banner. Loaded only while the banner is shown. Full-width dark bar; colours/fonts: override the
    --ic-* properties (defaults follow theme.json presets when present). Buttons share one size; the filled one is
    the suggested choice, the outlined ones stay as easy to hit (EDPB). */
-.ic-banner {
-	--ic-bg: var(--wp--preset--color--contrast, #111);
-	--ic-text: var(--wp--preset--color--base, #fff);
+:where(.ic-banner) {
+	--ic-bg: var(--wp--preset--color--primary-900, #04162B);
+	--ic-text: var(--wp--preset--color--white, #FFFFFF);
 	--ic-muted: rgb(255 255 255 / 78%);
 	--ic-line: rgb(255 255 255 / 22%);
 	--ic-outline: rgb(255 255 255 / 55%);
-	--ic-primary-bg: var(--wp--preset--color--surface, #f3f1ee);
-	--ic-primary-text: var(--wp--preset--color--contrast, #111);
+	--ic-primary-bg: var(--wp--preset--color--accent-300, #FFD400);
+	--ic-primary-text: var(--wp--preset--color--primary-900, #04162B);
+	--ic-btn-secondary-bg: transparent;
+	--ic-btn-secondary-color: var(--ic-text);
+	--ic-btn-secondary-border: var(--ic-outline);
+	--ic-btn-secondary-hover-bg: var(--ic-text);
+	--ic-btn-secondary-hover-color: var(--ic-bg);
+	--ic-btn-secondary-hover-border: var(--ic-text);
+	--ic-btn-primary-bg: var(--ic-primary-bg);
+	--ic-btn-primary-color: var(--ic-primary-text);
+	--ic-btn-primary-border: var(--ic-primary-bg);
+	--ic-btn-primary-hover-bg: var(--ic-text);
+	--ic-btn-primary-hover-color: var(--ic-bg);
+	--ic-btn-primary-hover-border: var(--ic-text);
 	--ic-radius: 2px;
 	--ic-font: var(--wp--preset--font-family--body, system-ui, sans-serif);
 
@@ -30,13 +42,13 @@
 	z-index: 100000;
 }
 
-.ic-banner *,
-.ic-banner *::before,
-.ic-banner *::after {
+:where(.ic-banner *),
+:where(.ic-banner *::before),
+:where(.ic-banner *::after) {
 	box-sizing: inherit;
 }
 
-.ic-inner {
+:where(.ic-inner) {
 	display: grid;
 	gap: 14px;
 	margin-inline: auto;
@@ -44,28 +56,28 @@
 	padding: 24px 16px;
 }
 
-.ic-title {
+:where(.ic-title) {
 	font-size: 20px;
 	font-weight: 600;
 	line-height: 1.2;
 	margin: 0;
 }
 
-.ic-text,
-.ic-intro,
-.ic-option-text {
+:where(.ic-text),
+:where(.ic-intro),
+:where(.ic-option-text) {
 	color: var(--ic-muted);
 	margin: 0;
 }
 
-.ic-text a {
+:where(.ic-text a) {
 	color: var(--ic-text);
 	font-weight: 600;
 	text-decoration: underline;
 	text-underline-offset: 3px;
 }
 
-.ic-settings {
+:where(.ic-settings) {
 	display: grid;
 	gap: 0;
 	max-height: 45vh;
@@ -73,41 +85,41 @@
 	padding-inline-end: 4px;
 }
 
-.ic-settings[hidden] {
+:where(.ic-settings[hidden]) {
 	display: none;
 }
 
-.ic-intro {
+:where(.ic-intro) {
 	padding-block: 4px 12px;
 }
 
-.ic-option {
+:where(.ic-option) {
 	border-top: 1px solid var(--ic-line);
 	display: grid;
 	gap: 6px;
 	padding-block: 14px;
 }
 
-.ic-option-head {
+:where(.ic-option-head) {
 	align-items: center;
 	display: flex;
 	gap: 16px;
 	justify-content: space-between;
 }
 
-.ic-option-title {
+:where(.ic-option-title) {
 	cursor: pointer;
 	font-size: 15px;
 	font-weight: 600;
 }
 
-.ic-always {
+:where(.ic-always) {
 	color: var(--ic-muted);
 	font-size: 13px;
 }
 
 /* Switch: a styled checkbox (role="switch"). */
-.ic-switch {
+:where(.ic-switch) {
 	appearance: none;
 	background: rgb(255 255 255 / 25%);
 	border-radius: 999px;
@@ -120,7 +132,7 @@
 	width: 50px;
 }
 
-.ic-switch::after {
+:where(.ic-switch::after) {
 	background: #fff;
 	border-radius: 50%;
 	content: "";
@@ -132,82 +144,86 @@
 	width: 22px;
 }
 
-.ic-switch:checked {
+:where(.ic-switch:checked) {
 	background: var(--ic-primary-bg);
 }
 
-.ic-switch:checked::after {
+:where(.ic-switch:checked::after) {
 	background: var(--ic-primary-text);
 	transform: translateX(22px);
 }
 
-.ic-actions {
+:where(.ic-actions) {
 	display: grid;
 	gap: 10px;
 	padding-top: 6px;
 }
 
-.ic-btn {
-	background: transparent;
-	border: 1px solid var(--ic-outline);
+:where(.ic-btn) {
+	background: var(--ic-btn-secondary-bg);
+	border: 1px solid var(--ic-btn-secondary-border);
 	border-radius: var(--ic-radius);
-	color: var(--ic-text);
+	color: var(--ic-btn-secondary-color);
 	cursor: pointer;
 	font: 600 15px/1.2 var(--ic-font);
 	min-height: 52px;
 	padding: 14px 24px;
 }
 
-.ic-btn:hover {
-	border-color: var(--ic-text);
+:where(.ic-btn:hover) {
+	background: var(--ic-btn-secondary-hover-bg);
+	border-color: var(--ic-btn-secondary-hover-border);
+	color: var(--ic-btn-secondary-hover-color);
 }
 
-.ic-btn.is-primary {
-	background: var(--ic-primary-bg);
-	border-color: var(--ic-primary-bg);
-	color: var(--ic-primary-text);
+:where(.ic-btn.is-primary) {
+	background: var(--ic-btn-primary-bg);
+	border-color: var(--ic-btn-primary-border);
+	color: var(--ic-btn-primary-color);
 	order: -1;
 }
 
-.ic-btn.is-primary:hover {
-	background: var(--ic-text);
+:where(.ic-btn.is-primary:hover) {
+	background: var(--ic-btn-primary-hover-bg);
+	border-color: var(--ic-btn-primary-hover-border);
+	color: var(--ic-btn-primary-hover-color);
 }
 
-.ic-btn[hidden] {
+:where(.ic-btn[hidden]) {
 	display: none;
 }
 
-.ic-banner :focus-visible {
+:where(.ic-banner :focus-visible) {
 	outline: 2px solid var(--ic-text);
 	outline-offset: 3px;
 }
 
 @media (min-width: 768px) {
-	.ic-inner {
+	:where(.ic-inner) {
 		gap: 16px;
 		padding: 32px 24px;
 	}
 
-	.ic-title {
+	:where(.ic-title) {
 		font-size: 24px;
 	}
 
-	.ic-text {
+	:where(.ic-text) {
 		font-size: 15px;
 	}
 
 	/* Suggested choice last (right); the others first, equal width. */
-	.ic-actions {
+	:where(.ic-actions) {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 12px;
 	}
 
-	.ic-btn {
+	:where(.ic-btn) {
 		flex: 0 0 220px;
 	}
 
-	.ic-btn.is-primary {
+	:where(.ic-btn.is-primary) {
 		order: 0;
 	}
 }

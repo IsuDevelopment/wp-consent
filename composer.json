@@ -4,7 +4,7 @@
 	"description": "Lightweight cookie consent banner with Google Consent Mode v2 and a consent log. No external scripts.",
 	"type": "wordpress-plugin",
 	"license": "GPL-3.0-or-later",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"require": {
 		"php": ">=8.2",
 		"yahnis-elsts/plugin-update-checker": "^5.6"

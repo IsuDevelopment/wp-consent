@@ -4,7 +4,7 @@ Tags: cookies, consent, privacy, google consent mode, gdpr
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -29,6 +29,10 @@ Download `isudev-consent.zip` from the GitHub releases page and install it as a 
 `composer require isudev/consent`
 
 == Changelog ==
+
+= 1.2.1 =
+* Lowered banner selector specificity to zero for theme overrides.
+* Added button background, text, border and hover design tokens.
 
 = 1.2.0 =
 * Added optional Gravity Forms `gform_submit` DataLayer events with page context.
