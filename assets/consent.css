@@ -1,0 +1,213 @@
+/* IsuDev Consent banner. Loaded only while the banner is shown. Full-width dark bar; colours/fonts: override the
+   --ic-* properties (defaults follow theme.json presets when present). Buttons share one size; the filled one is
+   the suggested choice, the outlined ones stay as easy to hit (EDPB). */
+.ic-banner {
+	--ic-bg: var(--wp--preset--color--contrast, #111);
+	--ic-text: var(--wp--preset--color--base, #fff);
+	--ic-muted: rgb(255 255 255 / 78%);
+	--ic-line: rgb(255 255 255 / 22%);
+	--ic-outline: rgb(255 255 255 / 55%);
+	--ic-primary-bg: var(--wp--preset--color--surface, #f3f1ee);
+	--ic-primary-text: var(--wp--preset--color--contrast, #111);
+	--ic-radius: 2px;
+	--ic-font: var(--wp--preset--font-family--body, system-ui, sans-serif);
+
+	background: var(--ic-bg);
+	bottom: 0;
+	box-shadow: 0 -8px 32px rgb(0 0 0 / 18%);
+	box-sizing: border-box;
+	color: var(--ic-text);
+	font-family: var(--ic-font);
+	font-size: 14px;
+	left: 0;
+	line-height: 1.55;
+	max-height: 100vh;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding-bottom: env(safe-area-inset-bottom);
+	position: fixed;
+	right: 0;
+	z-index: 100000;
+}
+
+.ic-banner *,
+.ic-banner *::before,
+.ic-banner *::after {
+	box-sizing: inherit;
+}
+
+.ic-inner {
+	display: grid;
+	gap: 14px;
+	margin-inline: auto;
+	max-width: 1200px;
+	padding: 24px 16px;
+}
+
+.ic-title {
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 1.2;
+	margin: 0;
+}
+
+.ic-text,
+.ic-intro,
+.ic-option-text {
+	color: var(--ic-muted);
+	margin: 0;
+}
+
+.ic-text a {
+	color: var(--ic-text);
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.ic-settings {
+	display: grid;
+	gap: 0;
+	max-height: 45vh;
+	overflow-y: auto;
+	padding-inline-end: 4px;
+}
+
+.ic-settings[hidden] {
+	display: none;
+}
+
+.ic-intro {
+	padding-block: 4px 12px;
+}
+
+.ic-option {
+	border-top: 1px solid var(--ic-line);
+	display: grid;
+	gap: 6px;
+	padding-block: 14px;
+}
+
+.ic-option-head {
+	align-items: center;
+	display: flex;
+	gap: 16px;
+	justify-content: space-between;
+}
+
+.ic-option-title {
+	cursor: pointer;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.ic-always {
+	color: var(--ic-muted);
+	font-size: 13px;
+}
+
+/* Switch: a styled checkbox (role="switch"). */
+.ic-switch {
+	appearance: none;
+	background: rgb(255 255 255 / 25%);
+	border-radius: 999px;
+	cursor: pointer;
+	flex: none;
+	height: 28px;
+	margin: 0;
+	position: relative;
+	transition: background 0.15s;
+	width: 50px;
+}
+
+.ic-switch::after {
+	background: #fff;
+	border-radius: 50%;
+	content: "";
+	height: 22px;
+	left: 3px;
+	position: absolute;
+	top: 3px;
+	transition: transform 0.15s;
+	width: 22px;
+}
+
+.ic-switch:checked {
+	background: var(--ic-primary-bg);
+}
+
+.ic-switch:checked::after {
+	background: var(--ic-primary-text);
+	transform: translateX(22px);
+}
+
+.ic-actions {
+	display: grid;
+	gap: 10px;
+	padding-top: 6px;
+}
+
+.ic-btn {
+	background: transparent;
+	border: 1px solid var(--ic-outline);
+	border-radius: var(--ic-radius);
+	color: var(--ic-text);
+	cursor: pointer;
+	font: 600 15px/1.2 var(--ic-font);
+	min-height: 52px;
+	padding: 14px 24px;
+}
+
+.ic-btn:hover {
+	border-color: var(--ic-text);
+}
+
+.ic-btn.is-primary {
+	background: var(--ic-primary-bg);
+	border-color: var(--ic-primary-bg);
+	color: var(--ic-primary-text);
+	order: -1;
+}
+
+.ic-btn.is-primary:hover {
+	background: var(--ic-text);
+}
+
+.ic-btn[hidden] {
+	display: none;
+}
+
+.ic-banner :focus-visible {
+	outline: 2px solid var(--ic-text);
+	outline-offset: 3px;
+}
+
+@media (min-width: 768px) {
+	.ic-inner {
+		gap: 16px;
+		padding: 32px 24px;
+	}
+
+	.ic-title {
+		font-size: 24px;
+	}
+
+	.ic-text {
+		font-size: 15px;
+	}
+
+	/* Suggested choice last (right); the others first, equal width. */
+	.ic-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+
+	.ic-btn {
+		flex: 0 0 220px;
+	}
+
+	.ic-btn.is-primary {
+		order: 0;
+	}
+}
